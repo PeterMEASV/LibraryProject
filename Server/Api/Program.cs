@@ -22,7 +22,11 @@ builder.Services.AddScoped<IAuthorService, AuthorService>();
 
 // Adding swagger documentation here
 builder.Services.AddControllers();
-builder.Services.AddOpenApiDocument();
+builder.Services.AddOpenApiDocument(config =>
+{
+    config.Title = "Peter's Library API";
+    config.Version = "0.0.1";
+});
 
 // Adding exception handler
 builder.Services.AddProblemDetails();
@@ -51,6 +55,7 @@ app.UseCors(config => config
     .AllowAnyHeader()
     .SetIsOriginAllowed(x => true));
 
+await app.GenerateApiClientsFromOpenApi("/../../client/src/generated-ts-client.ts");
 
 
 app.Run();
