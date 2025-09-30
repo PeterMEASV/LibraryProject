@@ -12,7 +12,15 @@ builder.Services.AddDbContext<MyDbContext>(conf =>
     conf.UseNpgsql(appOptions.DBConnection);
 } );
 
+builder.Services.AddCors();
+
 var app = builder.Build();
+
+app.UseCors(config => config
+    .AllowAnyOrigin()
+    .AllowAnyMethod()
+    .AllowAnyHeader()
+    .SetIsOriginAllowed(x => true));
 
 
 //Just for testing purposes
