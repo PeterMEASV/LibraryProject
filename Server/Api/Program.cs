@@ -18,10 +18,12 @@ builder.Services.AddDbContext<MyDbContext>(conf =>
 } );
 
 // Adding services
+builder.Services.AddControllers();
 builder.Services.AddScoped<IAuthorService, AuthorService>();
+builder.Services.AddScoped<IBookService, BookService>();
+builder.Services.AddScoped<IGenreService, GenreService>();
 
 // Adding swagger documentation here
-builder.Services.AddControllers();
 builder.Services.AddOpenApiDocument(config =>
 {
     config.Title = "Peter's Library API";
