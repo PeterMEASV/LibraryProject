@@ -23,6 +23,25 @@ public class BookService(MyDbContext dbContext) : IBookService
             )
         ).ToList();
     }
+    
+    public async Task<ActionResult<BookDto>> GetBookById(String id)
+    {
+        var book = await dbContext.Books.Include(b => b.Authors).Include(b => b.Genre).FirstOrDefaultAsync(b => b.Id == id);
+        
+        if (book == null)
+        {
+            throw new Exception("Book not found");
+        }
+        
+        return new BookDto(
+            book.Id,
+            book.Title,
+            book.Pages,
+            book.Genre?.Name,
+            book.Createdat,
+            book.Authors.Select(b => new AuthorShortDto(b.Id, b.Name)).ToList()
+        );
+    }
 
 
     public async Task<ActionResult<BookDto>> CreateBook(CreateBookDto createBookDto)

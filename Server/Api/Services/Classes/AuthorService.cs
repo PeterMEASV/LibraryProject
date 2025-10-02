@@ -87,6 +87,23 @@ public class AuthorService(MyDbContext dbContext) : IAuthorService
             author.Books.Select(b => new BookShortDto(b.Id, b.Title)).ToList()
         );
     }
+    
+    public async Task<ActionResult<AuthorDto>> GetAuthorById(String id)
+    {
+        var author = await dbContext.Authors
+            .Include(a => a.Books)
+            .FirstOrDefaultAsync(a => a.Id == id);
+        if (author == null)
+        {
+            throw new Exception("Author not found");
+        }
+        return new AuthorDto(
+            author.Id,
+            author.Name,
+            author.Createdat,
+            author.Books.Select(b => new BookShortDto(b.Id, b.Title)).ToList()
+        );
+    }
 
     
     

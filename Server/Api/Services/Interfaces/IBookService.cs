@@ -10,4 +10,5 @@ public interface IBookService
     Task<ActionResult<BookDto>> CreateBook(CreateBookDto createBookDto);
     Task<ActionResult<BookDto>> UpdateBook(UpdateBookDto updateBookDto);
     void DeleteBook(DeleteBookDto deleteBookDto);
+    Task<ActionResult<BookDto>> GetBookById(string id);
 }

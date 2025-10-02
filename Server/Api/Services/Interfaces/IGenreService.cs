@@ -10,4 +10,5 @@ public interface IGenreService
     Task<ActionResult<Genre>> CreateGenre(CreateGenreDTO createGenreDto);
     void DeleteGenre(DeleteGenreDTO deleteGenreDto);
     Task<ActionResult<GenreDTO>> UpdateGenre(UpdateGenreDTO updateGenreDto);
+    Task<ActionResult<GenreDTO>> GetGenreById(string id);
 }

@@ -16,6 +16,13 @@ public class GenreController(IGenreService genreService) : ControllerBase
         return await genreService.GetAllGenres();
     }
 
+    [Route(nameof(GetGenreById))]
+    [HttpGet]
+    public async Task<ActionResult<GenreDTO>> GetGenreById(String id)
+    {
+        return await genreService.GetGenreById(id);
+    }
+
     [Route(nameof(CreateGenre))]
     [HttpPost]
     public async Task<ActionResult<Genre>> CreateGenre([FromBody] CreateGenreDTO createGenreDto)

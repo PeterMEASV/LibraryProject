@@ -1,0 +1,5 @@
+@import "tailwindcss";
+@plugin "daisyui";
+h1 {
+    text-align: center;
+}

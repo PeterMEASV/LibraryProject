@@ -10,4 +10,5 @@ public interface IAuthorService
     Task<ActionResult<List<AuthorDto>>> GetAllAuthors();
     void DeleteAuthor(DeleteAuthorDTO deleteAuthorDto);
     Task<AuthorDto> UpdateAuthor(UpdateAuthorDTO updateAuthorDto);
+    Task<ActionResult<AuthorDto>> GetAuthorById(string id);
 }

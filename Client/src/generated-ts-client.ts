@@ -50,6 +50,43 @@ export class AuthorClient {
         return Promise.resolve<AuthorDto[]>(null as any);
     }
 
+    getAuthorById(id: string | undefined): Promise<AuthorDto> {
+        let url_ = this.baseUrl + "/GetAuthorById?";
+        if (id === null)
+            throw new globalThis.Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: RequestInit = {
+            method: "GET",
+            headers: {
+                "Accept": "application/json"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processGetAuthorById(_response);
+        });
+    }
+
+    protected processGetAuthorById(response: Response): Promise<AuthorDto> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as AuthorDto;
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<AuthorDto>(null as any);
+    }
+
     createAuthor(createAuthorDto: CreateAuthorDTO): Promise<Author> {
         let url_ = this.baseUrl + "/CreateAuthor";
         url_ = url_.replace(/[?&]$/, "");
@@ -210,6 +247,43 @@ export class BookClient {
         return Promise.resolve<BookDto[]>(null as any);
     }
 
+    getBookById(id: string | undefined): Promise<BookDto> {
+        let url_ = this.baseUrl + "/GetBookById?";
+        if (id === null)
+            throw new globalThis.Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: RequestInit = {
+            method: "GET",
+            headers: {
+                "Accept": "application/json"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processGetBookById(_response);
+        });
+    }
+
+    protected processGetBookById(response: Response): Promise<BookDto> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as BookDto;
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<BookDto>(null as any);
+    }
+
     createBook(createBookDto: CreateBookDto): Promise<BookDto> {
         let url_ = this.baseUrl + "/CreateBook";
         url_ = url_.replace(/[?&]$/, "");
@@ -368,6 +442,43 @@ export class GenreClient {
             });
         }
         return Promise.resolve<GenreDTO[]>(null as any);
+    }
+
+    getGenreById(id: string | undefined): Promise<GenreDTO> {
+        let url_ = this.baseUrl + "/GetGenreById?";
+        if (id === null)
+            throw new globalThis.Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: RequestInit = {
+            method: "GET",
+            headers: {
+                "Accept": "application/json"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processGetGenreById(_response);
+        });
+    }
+
+    protected processGetGenreById(response: Response): Promise<GenreDTO> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as GenreDTO;
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<GenreDTO>(null as any);
     }
 
     createGenre(createGenreDto: CreateGenreDTO): Promise<Genre> {

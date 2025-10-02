@@ -16,6 +16,13 @@ public class BookController(IBookService bookService) : ControllerBase
         return await bookService.GetAllBooks();
         
     }
+
+    [Route(nameof(GetBookById))]
+    [HttpGet]
+    public async Task<ActionResult<BookDto>> GetBookById(String id)
+    {
+        return await bookService.GetBookById(id);
+    }
     
     [Route(nameof(CreateBook))]
     [HttpPost]

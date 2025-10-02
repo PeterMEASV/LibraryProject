@@ -16,6 +16,13 @@ public class AuthorController(IAuthorService authorService) : ControllerBase
         
     }
 
+    [Route(nameof(GetAuthorById))]
+    [HttpGet]
+    public async Task<ActionResult<AuthorDto>> GetAuthorById(String id)
+    {
+        return await authorService.GetAuthorById(id);
+    }
+
     [Route(nameof(CreateAuthor))]
     [HttpPost]
     public async Task<ActionResult<Author>> CreateAuthor([FromBody] CreateAuthorDTO createAuthorDto)

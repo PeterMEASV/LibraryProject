@@ -29,6 +29,36 @@
         }
       }
     },
+    "/GetAuthorById": {
+      "get": {
+        "tags": [
+          "Author"
+        ],
+        "operationId": "Author_GetAuthorById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthorDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/CreateAuthor": {
       "post": {
         "tags": [
@@ -149,6 +179,36 @@
         }
       }
     },
+    "/GetBookById": {
+      "get": {
+        "tags": [
+          "Book"
+        ],
+        "operationId": "Book_GetBookById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BookDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/CreateBook": {
       "post": {
         "tags": [
@@ -262,6 +322,36 @@
                   "items": {
                     "$ref": "#/components/schemas/GenreDTO"
                   }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/GetGenreById": {
+      "get": {
+        "tags": [
+          "Genre"
+        ],
+        "operationId": "Genre_GetGenreById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenreDTO"
                 }
               }
             }

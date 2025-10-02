@@ -12,6 +12,16 @@ public class GenreService(MyDbContext dbContext) : IGenreService
     {
         return await dbContext.Genres.Select(g => new GenreDTO(g.Id, g.Name, g.Createdat)).ToListAsync();
     }
+    
+    public async Task<ActionResult<GenreDTO>> GetGenreById(String id)
+    {
+        var genre = await dbContext.Genres.FirstOrDefaultAsync(g => g.Id == id);
+        if (genre == null)
+        {
+            throw new Exception("Genre not found");
+        }
+        return new GenreDTO(genre.Id, genre.Name, genre.Createdat);
+    }
 
     public async Task<ActionResult<Genre>> CreateGenre(CreateGenreDTO createGenreDto)
     {
