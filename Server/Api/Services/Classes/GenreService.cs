@@ -1,4 +1,5 @@
-﻿using Api.Controllers;
+﻿using System.ComponentModel.DataAnnotations;
+using Api.Controllers;
 using Api.Services.Interfaces;
 using DataAccess;
 using Microsoft.AspNetCore.Mvc;
@@ -25,6 +26,10 @@ public class GenreService(MyDbContext dbContext) : IGenreService
 
     public async Task<ActionResult<Genre>> CreateGenre(CreateGenreDTO createGenreDto)
     {
+        if (createGenreDto.Name.Length <= 3 || createGenreDto.Name.Length >= 30)
+        {
+            throw new ValidationException("Genre name must be between 3 and 30 characters long");
+        }
         var newGenre = new Genre
         {
             Id = Guid.NewGuid().ToString(),
@@ -52,6 +57,10 @@ public class GenreService(MyDbContext dbContext) : IGenreService
     
     public async Task<ActionResult<GenreDTO>> UpdateGenre(UpdateGenreDTO updateGenreDto)
     {
+        if (updateGenreDto.Name.Length <= 3 || updateGenreDto.Name.Length >= 30)
+        {
+            throw new ValidationException("Genre name must be between 3 and 30 characters long");
+        }
         var genre = await dbContext.Genres.FirstOrDefaultAsync(g => g.Id == updateGenreDto.Id);
         if (genre == null)
         {

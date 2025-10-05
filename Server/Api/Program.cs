@@ -1,3 +1,4 @@
+using System.Data.Common;
 using api;
 using Api;
 using Api.Services.Classes;
@@ -6,58 +7,70 @@ using DataAccess;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-var builder = WebApplication.CreateBuilder(args);
+public class Program
+{
 
-// Adding app options
-var appOptions = builder.Services.AddAppOptions(builder.Configuration);
+    public static void ConfigureServices(IServiceCollection services)
+    {
+        services.AddSingleton<AppOptions>(provider =>
+        {
+            var configuration = provider.GetRequiredService<IConfiguration>();
+            var appOptions = new AppOptions();
+            configuration.GetSection(nameof(AppOptions)).Bind(appOptions);
+            return appOptions;
+        });
 
 // Adding db context
-builder.Services.AddDbContext<MyDbContext>(conf =>
-{
-    conf.UseNpgsql(appOptions.DBConnection);
-} );
+        services.AddDbContext<MyDbContext>((services, options) => {options.UseNpgsql(services.GetRequiredService<AppOptions>().DBConnection); });
 
 // Adding services
-builder.Services.AddControllers();
-builder.Services.AddScoped<IAuthorService, AuthorService>();
-builder.Services.AddScoped<IBookService, BookService>();
-builder.Services.AddScoped<IGenreService, GenreService>();
+        services.AddControllers();
+        services.AddScoped<IAuthorService, AuthorService>();
+        services.AddScoped<IBookService, BookService>();
+        services.AddScoped<IGenreService, GenreService>();
 
 // Adding swagger documentation here
-builder.Services.AddOpenApiDocument(config =>
-{
-    config.Title = "Peter's Library API";
-    config.Version = "0.0.1";
-});
+        services.AddOpenApiDocument(config =>
+        {
+            config.Title = "Peter's Library API";
+            config.Version = "0.0.1";
+        });
 
 // Adding exception handler
-builder.Services.AddProblemDetails();
-builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+        services.AddProblemDetails();
+        services.AddExceptionHandler<GlobalExceptionHandler>();
 
 // Adding cors stuff
-builder.Services.AddCors();
+        services.AddCors();
+    }
 
-var app = builder.Build();
+    public static async Task Main(string[] args)
+    {
+        var builder = WebApplication.CreateBuilder(args);
+        ConfigureServices(builder.Services);
+        var app = builder.Build();
 
 //Controller setup
-app.MapControllers();
+        app.MapControllers();
 
 //adding swagger documentation here
-app.UseOpenApi();
-app.UseSwaggerUi();
+        app.UseOpenApi();
+        app.UseSwaggerUi();
 
 
 //adding the exception handler
-app.UseExceptionHandler();
+        app.UseExceptionHandler();
 
 // allowing cors stuff
-app.UseCors(config => config
-    .AllowAnyOrigin()
-    .AllowAnyMethod()
-    .AllowAnyHeader()
-    .SetIsOriginAllowed(x => true));
+        app.UseCors(config => config
+            .AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .SetIsOriginAllowed(x => true));
 
-await app.GenerateApiClientsFromOpenApi("/../../client/src/generated-ts-client.ts");
+       await app.GenerateApiClientsFromOpenApi("/../../client/src/generated-ts-client.ts");
 
 
-app.Run();
+        app.Run();
+    }
+}

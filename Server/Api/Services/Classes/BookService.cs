@@ -1,4 +1,5 @@
-﻿using Api.Controllers;
+﻿using System.ComponentModel.DataAnnotations;
+using Api.Controllers;
 using Api.Services.Interfaces;
 using DataAccess;
 using Microsoft.AspNetCore.Mvc;
@@ -46,6 +47,18 @@ public class BookService(MyDbContext dbContext) : IBookService
 
     public async Task<ActionResult<BookDto>> CreateBook(CreateBookDto createBookDto)
     {
+        if (createBookDto.Title.Length <= 3 || createBookDto.Title.Length >= 50)
+        {
+            throw new ValidationException("Book title must be between 3 and 50 characters long");
+        }
+        else if (createBookDto.AuthorIDs.Count < 1)
+        {
+            throw new ValidationException("Book must have at least one author");
+        }
+        else if (createBookDto.Pages <= 3)
+        {
+            throw new ValidationException("Book must have at least 3 pages");
+        }
         var authors = new List<Author>();
 
         foreach (var authorId in createBookDto.AuthorIDs)
@@ -89,6 +102,18 @@ public class BookService(MyDbContext dbContext) : IBookService
 
     public async Task<ActionResult<BookDto>> UpdateBook(UpdateBookDto updateBookDto)
     {
+        if (updateBookDto.Title.Length <= 3 || updateBookDto.Title.Length >= 50)
+        {
+            throw new ValidationException("Book title must be between 3 and 50 characters long");
+        }
+        else if (updateBookDto.AuthorIDs.Count < 1)
+        {
+            throw new ValidationException("Book must have at least one author");
+        }
+        else if (updateBookDto.Pages <= 3)
+        {
+            throw new ValidationException("Book must have at least 3 pages");
+        }
         var authors = new List<Author>();
 
         foreach (var authorId in updateBookDto.AuthorIDs)

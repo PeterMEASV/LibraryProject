@@ -1,4 +1,5 @@
-﻿using Api.Controllers;
+﻿using System.ComponentModel.DataAnnotations;
+using Api.Controllers;
 using Api.Services.Interfaces;
 using DataAccess;
 using Microsoft.AspNetCore.Mvc;
@@ -26,6 +27,11 @@ public class AuthorService(MyDbContext dbContext) : IAuthorService
 
     public async Task<Author> CreateAuthor(CreateAuthorDTO createAuthorDto)
     {
+
+        if (createAuthorDto.Name.Length < 3 || createAuthorDto.Name.Length > 50)
+        {
+            throw new ValidationException("Author name must be between 3 and 50 characters long");
+        }
         var NewAuthor = new Author()
         {
             Id = Guid.NewGuid().ToString(),
@@ -54,6 +60,10 @@ public class AuthorService(MyDbContext dbContext) : IAuthorService
 
     public async Task<AuthorDto> UpdateAuthor(UpdateAuthorDTO updateAuthorDto)
     {
+        if (updateAuthorDto.Name.Length <= 3 || updateAuthorDto.Name.Length >= 50)
+        {
+            throw new ValidationException("Author name must be between 3 and 50 characters long");
+        }
         var author = await dbContext.Authors
             .Include(a => a.Books)
             .FirstOrDefaultAsync(a => a.Id == updateAuthorDto.Id);
