@@ -5,11 +5,11 @@ namespace Api.Controllers;
 
 public record CreateAuthorDTO([Length(3, 50)]string Name);
 
-public record DeleteAuthorDTO(string Id);
+public record DeleteAuthorDTO([MinLength(30)]string Id);
 
 public record AuthorId(string Id);
 
-public record UpdateAuthorDTO(string Id, [Length(1, 50)]string Name, List<String> BookIds);
+public record UpdateAuthorDTO(string Id, [Length(3, 50)]string Name, List<String> BookIds);
 
 public record AuthorShortDto(string Id, string Name);
 
