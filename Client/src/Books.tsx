@@ -3,6 +3,7 @@ import type {BookDto} from "./generated-ts-client.ts";
 import {useEffect, useState} from "react";
 import {bookClient} from "./baseUrl.ts";
 import {useNavigate} from "react-router";
+import {toast} from "react-toastify";
 
 type SortField = 'title' | 'createdat' | 'pages' | 'genre' | 'authors';
 type SortDirection = 'asc' | 'desc';
@@ -11,6 +12,8 @@ function Books() {
     const [books, setBooks] = useState<BookDto[]>([])
     const [sortField, setSortField] = useState<SortField>('title')
     const [sortDirection, setSortDirection] = useState<SortDirection>('asc')
+    const [showDeleteModal, setShowDeleteModal] = useState(false)
+    const [bookToDelete, setBookToDelete] = useState<string | undefined>(undefined)
     const navigate = useNavigate();
 
     useEffect( () => {
@@ -55,6 +58,30 @@ function Books() {
     const SortIcon = ({ field }: { field: SortField }) => {
         if (sortField !== field) return <span className="opacity-30">⇅</span>
         return sortDirection === 'asc' ? <span>↑</span> : <span>↓</span>
+    }
+    
+    const handleDelete = (id: string | undefined) => {
+        setBookToDelete(id)
+        setShowDeleteModal(true)
+    }
+    
+    const handleDeleteConfirm = () => {
+        if (!bookToDelete) return;
+        
+        bookClient.deleteBook({ id: bookToDelete }).then(() => {
+            toast.success("Book deleted successfully!");
+            setBooks(books.filter(book => book.id !== bookToDelete));
+            setShowDeleteModal(false);
+            setBookToDelete(undefined);
+        }).catch(err => {
+            console.error(err);
+            toast.error("Failed to delete book.");
+        });
+    }
+    
+    const handleDeleteCancel = () => {
+        setShowDeleteModal(false)
+        setBookToDelete(undefined)
     }
     
     return (
@@ -133,13 +160,26 @@ function Books() {
                             <td>
                                 <div className="flex gap-2">
                                     <button className="btn btn-outline btn-warning hover:!bg-warning" onClick={() => navigate(`${book.id}/edit`)}>Edit</button>
-                                <button className="btn btn-outline btn-error hover:!bg-error">Delete</button>
+                                    <button className="btn btn-outline btn-error hover:!bg-error" onClick={() => handleDelete(book.id)}>Delete</button>
                                 </div>
                             </td>
                         </tr>
                     ))}
                 </tbody>
             </table>
+
+            {showDeleteModal && (
+                <dialog className="modal modal-open">
+                    <div className="modal-box">
+                        <h3 className="font-bold text-lg">Confirm Delete</h3>
+                        <p className="py-4">Are you sure you want to delete this book? This action cannot be undone.</p>
+                        <div className="modal-action">
+                            <button className="btn" onClick={handleDeleteCancel}>Cancel</button>
+                            <button className="btn btn-error" onClick={handleDeleteConfirm}>Delete</button>
+                        </div>
+                    </div>
+                </dialog>
+            )}
         </div>
     )
 }

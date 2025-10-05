@@ -3,7 +3,7 @@ using DataAccess;
 
 namespace Api.Controllers;
 
-public record CreateAuthorDTO([Length(1, 50)]string Name);
+public record CreateAuthorDTO([Length(3, 50)]string Name);
 
 public record DeleteAuthorDTO(string Id);
 

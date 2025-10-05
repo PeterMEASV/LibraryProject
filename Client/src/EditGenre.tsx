@@ -3,6 +3,7 @@ import {genreClient} from "./baseUrl.ts";
 import {useState} from "react";
 import {useEffect} from "react";
 import type {UpdateGenreDTO} from "./generated-ts-client.ts";
+import {toast} from "react-toastify";
 
 function EditGenre() {
     const { GenreId } = useParams();
@@ -23,7 +24,10 @@ function EditGenre() {
         genreClient.updateGenre(updateDto).then(res => {
             console.log("Genre updated successfully: ", res)
 
-            // Remember to add Toastify here
+            toast.success("Genre updated successfully!");
+        }).catch(err => {
+            console.error(err)
+            toast.error("Failed to update genre.");
         })
     }
 

@@ -3,22 +3,28 @@ import './Create.css'
 import {useState, useEffect} from "react";
 import {authorClient, bookClient, genreClient} from "./baseUrl.ts";
 import type {AuthorDto, GenreDTO} from "./generated-ts-client.ts";
+import {toast} from "react-toastify";
 
 function Create() {
-
     //Author stuff
     const [authorName, setAuthorName] = useState('')
     const handleCreateAuthor = () => {
         if(authorName) {
             authorClient.createAuthor({name: authorName}).then(res => {
                 console.log("Author created successfully: ", res)
+                toast.success(`${authorName} created successfully!`);
                 setAuthorName('');
-                //todo Probably needs a toastify
 
                 refreshAuthorList();
-            })
-        }
+            }).catch((err) => {
+                console.error("Full error object:", err);
+            
+            let errorMessage = "Failed to create author.";
+            errorMessage = handleError(err, errorMessage);
+            toast.error(errorMessage);
+        });
     }
+}
 
     //Book stuff
     const [bookTitle, setBookTitle] = useState('')
@@ -97,14 +103,20 @@ function Create() {
                 authorIDs: bookAuthorIDs
             }).then(res => {
                 console.log("Book created successfully: ", res);
+                toast.success(`${bookTitle} created successfully!`);
+
                 // Reset form
                 setBookTitle('');
                 setBookPages(0);
                 setBookGenreId('');
                 setBookAuthorIDs([]);
                 setGenreSearchTerm('');
-                //todo Probably needs a toastify
-            }).catch(err => console.error(err));
+            }).catch(err => {
+                console.error(err);
+                let errorMessage = "Failed to create book.";
+                errorMessage = handleError(err, errorMessage);
+                toast.error(errorMessage);
+            });
         }
     }
 
@@ -115,12 +127,40 @@ function Create() {
         if(genreName) {
             genreClient.createGenre({name: genreName}).then(res => {
                 console.log("Genre created successfully: ", res)
+                toast.success(`${genreName} created successfully!`);
                 setGenreName('');
-                //todo Probably needs a toastify
 
                 refreshGenreList();
+            }).catch(err => {
+                console.error(err);
+                let errorMessage = "Failed to create genre.";
+                errorMessage = handleError(err, errorMessage);
+                toast.error(errorMessage);
             })
         }
+    }
+
+    const handleError = (err: any, errorMessage: string) => {
+        if (err.response) {
+            try {
+                const errorData = JSON.parse(err.response);
+
+                if (errorData.errors) {
+                    const firstErrorKey = Object.keys(errorData.errors)[0];
+                    if (firstErrorKey && errorData.errors[firstErrorKey].length > 0) {
+                        errorMessage = errorData.errors[firstErrorKey][0];
+                    }
+                } else if (errorData.title) {
+                    errorMessage = errorData.title;
+                }
+            } catch {
+                errorMessage = err.response;
+            }
+        } else if (err.message) {
+            errorMessage = err.message;
+        }
+
+        return errorMessage;
     }
 
     return (
@@ -134,9 +174,18 @@ function Create() {
                 </div>
             </details>
 
-            <details className="collapse bg-base-100 border-base-300 border">
-                <summary className="collapse-title font-semibold">Click to create a new Book.</summary>
+            <details className="collapse bg-secondary/20 border-base-300 border">
+                <summary className="collapse-title font-semibold">Click to create a new Genre.</summary>
                 <div className="collapse-content flex flex-col gap-2">
+                    <p>Enter the name</p>
+                    <input type="text" value={genreName} onChange={(e) => setGenreName(e.target.value)}/>
+                    <button onClick={() => handleCreateGenre()}>Create Genre</button>
+                </div>
+            </details>
+
+            <details className="collapse bg-primary/20 border-base-300 border" style={{overflow: 'visible'}}>
+                <summary className="collapse-title font-semibold">Click to create a new Book.</summary>
+                <div className="collapse-content flex flex-col gap-2" style={{overflow: 'visible'}}>
                     <p>Title:</p>
                     <input 
                         type="text" 
@@ -155,32 +204,45 @@ function Create() {
 
                     <p>Genre:</p>
                     <div className="dropdown-container">
-                        <input type="text" value={genreSearchTerm} onChange={(e) => {setGenreSearchTerm(e.target.value);setShowGenreDropdown(true);}}
-                            onFocus={() => setShowGenreDropdown(true)} placeholder="Search for a genre..."/>
+                        <input 
+                            type="text" 
+                            value={genreSearchTerm} 
+                            onChange={(e) => {setGenreSearchTerm(e.target.value);setShowGenreDropdown(true);}}
+                            onFocus={() => setShowGenreDropdown(true)}
+                            onBlur={() => setTimeout(() => setShowGenreDropdown(false), 150)}
+                            placeholder="Search for a genre..."
+                        />
 
                         {showGenreDropdown && filteredGenres.length > 0 && (
                             <div className="dropdown-menu">
                                 {filteredGenres.map(genre => (
-                                    <div
-                                        key={genre.id}
-                                        onClick={() => handleGenreSelect(genre)}
-                                        className={`dropdown-item ${bookGenreId === genre.id ? 'selected' : ''}`}> {genre.name} </div>))}
+                                    <div key={genre.id} onMouseDown={(e) => e.preventDefault()}
+                                        onClick={() => handleGenreSelect(genre)} className={`dropdown-item ${bookGenreId === genre.id ? 'selected' : ''}`}>
+                                        {genre.name}
+                                    </div>
+                                ))}
                             </div>
                         )}
                     </div>
 
                     <p>Authors:</p>
                     <div className="dropdown-container">
-                        <input type="text" value={authorSearchTerm} onChange={(e) => {setAuthorSearchTerm(e.target.value);setShowAuthorDropdown(true);}}
-                            onFocus={() => setShowAuthorDropdown(true)} placeholder="Search for an author..."/>
+                        <input 
+                            type="text" 
+                            value={authorSearchTerm} 
+                            onChange={(e) => {setAuthorSearchTerm(e.target.value);setShowAuthorDropdown(true);}}
+                            onFocus={() => setShowAuthorDropdown(true)}
+                            onBlur={() => setTimeout(() => setShowAuthorDropdown(false), 150)}
+                            placeholder="Search for an author..."
+                        />
 
                         {showAuthorDropdown && filteredAuthors.length > 0 && (
                             <div className="dropdown-menu">
                                 {filteredAuthors.map(author => (
-                                    <div
-                                        key={author.id}
-                                        onClick={() => handleAuthorAdd(author)}
-                                        className="dropdown-item"> {author.name} </div>
+                                    <div key={author.id} onMouseDown={(e) => e.preventDefault()}
+                                         onClick={() => handleAuthorAdd(author)} className="dropdown-item">
+                                        {author.name}
+                                    </div>
                                 ))}
                             </div>
                         )}
@@ -202,15 +264,6 @@ function Create() {
                     )}
 
                     <button onClick={() => handleCreateBook()}>Create Book</button>
-                </div>
-            </details>
-
-            <details className="collapse bg-base-100 border-base-300 border">
-                <summary className="collapse-title font-semibold">Click to create a new Genre.</summary>
-                <div className="collapse-content flex flex-col gap-2">
-                    <p>Enter the name</p>
-                    <input type="text" value={genreName} onChange={(e) => setGenreName(e.target.value)}/>
-                    <button onClick={() => handleCreateGenre()}>Create Genre</button>
                 </div>
             </details>
         </div>

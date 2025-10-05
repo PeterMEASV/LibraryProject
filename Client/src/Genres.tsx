@@ -3,6 +3,7 @@ import type {GenreDTO} from "./generated-ts-client.ts";
 import {useEffect, useState} from "react";
 import {genreClient} from "./baseUrl.ts";
 import {useNavigate} from "react-router";
+import {toast} from "react-toastify";
 
 type SortField = 'name' | 'createdat';
 type SortDirection = 'asc' | 'desc';
@@ -12,6 +13,8 @@ function Genres() {
     const [sortField, setSortField] = useState<SortField>('name')
     const [sortDirection, setSortDirection] = useState<SortDirection>('asc')
     const navigate = useNavigate();
+    const [genreToDelete, setGenreToDelete] = useState<string | undefined>(undefined)
+    const [showDeleteModal, setShowDeleteModal] = useState(false)
 
     useEffect( () => {
         genreClient.getAllGenres().then(res => {
@@ -46,6 +49,30 @@ function Genres() {
     const SortIcon = ({ field }: { field: SortField }) => {
         if (sortField !== field) return <span className="opacity-30">⇅</span>
         return sortDirection === 'asc' ? <span>↑</span> : <span>↓</span>
+    }
+
+    const handleDelete = (id: string | undefined) => {
+        setGenreToDelete(id)
+        setShowDeleteModal(true)
+    }
+
+    const handleDeleteConfirm = () => {
+        if (!genreToDelete) return;
+
+        genreClient.deleteGenre({ id: genreToDelete }).then(() => {
+            toast.success("Genre deleted successfully!");
+            setGenres(genres.filter(genre => genre.id !== genreToDelete));
+            setShowDeleteModal(false);
+            setGenreToDelete(undefined);
+        }).catch(err => {
+            console.error(err);
+            toast.error("Failed to delete genre.");
+        })
+    }
+
+    const handleDeleteCancel = () => {
+        setShowDeleteModal(false)
+        setGenreToDelete(undefined)
     }
     
     return (
@@ -83,13 +110,25 @@ function Genres() {
                             <td>
                                 <div className="flex gap-2">
                                     <button className="btn btn-outline btn-warning hover:!bg-warning" onClick={() => navigate(`${genre.id}/edit`)}>Edit</button>
-                                <button className="btn btn-outline btn-error hover:!bg-error">Delete</button>
+                                <button className="btn btn-outline btn-error hover:!bg-error" onClick={() => handleDelete(genre.id)}>Delete</button>
                                 </div>
                             </td>
                         </tr>
                     ))}
                 </tbody>
             </table>
+            {showDeleteModal && (
+                <dialog className="modal modal-open">
+                    <div className="modal-box">
+                        <h3 className="font-bold text-lg">Confirm Delete</h3>
+                        <p className="py-4">Are you sure you want to delete this genre? This action cannot be undone.</p>
+                        <div className="modal-action">
+                            <button className="btn" onClick={handleDeleteCancel}>Cancel</button>
+                            <button className="btn btn-error" onClick={handleDeleteConfirm}>Delete</button>
+                        </div>
+                    </div>
+                </dialog>
+            )}
         </div>
     )
 }

@@ -1,4 +1,6 @@
-﻿namespace Api.Controllers;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Api.Controllers;
 
 public record CreateGenreDTO(String Name);
 

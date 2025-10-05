@@ -3,6 +3,7 @@ import {useParams} from "react-router";
 import {authorClient, bookClient} from "./baseUrl.ts";
 import {useState, useEffect} from "react";
 import type {UpdateAuthorDTO, BookDto} from "./generated-ts-client.ts";
+import {toast} from "react-toastify";
 
 function EditAuthor() {
     const { AuthorId } = useParams();
@@ -61,8 +62,11 @@ function EditAuthor() {
 
         authorClient.updateAuthor(updateDto).then(res => {
             console.log("Author updated successfully: ", res);
-            // Remember to add Toastify here
-        }).catch(err => console.error(err));
+            toast.success("Author updated successfully!");
+        }).catch(err => {
+            console.error(err);
+            toast.error("Failed to update author.");
+        });
     };
 
     return (
